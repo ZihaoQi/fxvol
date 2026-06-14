@@ -1,23 +1,33 @@
-# Bloomberg OVML validation data (USDCNY, 2025-03-05)
+# Bloomberg OVML validation data (USDCNH)
 
-Transcribe the numbers from the Bloomberg OVML screenshots into these two CSVs.
+**The data files in this folder are licensed Bloomberg terminal output and are
+NOT committed to the repository** (they are git-ignored). To reproduce the
+validation, supply your own Bloomberg OVML snapshot in the schemas below.
 
-## `USDCNY_20250305_market.csv` — raw market data, one row per tenor
-- `spot` is constant (7.2605 for 2025-03-05); repeat it on each row.
-- `r_dom`, `r_for`: continuously-compounded CNH and USD rates at that tenor
-  (derive from the interest-rate / forward-points screen).
-- `atm_vol`, `rr25`, `bf25`, `rr10`, `bf10`: from the volatility-data screen,
-  in DECIMAL (5% -> 0.05, -0.30% RR -> -0.003).
-- Add/remove tenor rows to match the screenshot (1W,2W,1M,2M,3M,6M,9M,1Y,18M,2Y...).
+## Files (you provide these)
+- `volatility_surface.csv` — raw ATM / 25D RR-BF / 10D RR-BF per tenor.
+- `detailed_volatility_smile.csv` — Bloomberg's calibrated strike + vol at each
+  delta point (one row per `tenor, delta_point, strike, vol_pct`).
+- `rates_20250305.csv` — `tenor, usd_deposit_pct, cny_deposit_pct, usdcnh_forward`.
 
-## `USDCNY_20250305_bbg_target.csv` — Bloomberg's calibrated output
-- One row per (tenor, delta point). `delta_label` from:
-  5DP,10DP,15DP,25DP,35DP,ATM,35DC,25DC,15DC,10DC,5DC.
-- `strike`, `vol` are Bloomberg's calibrated numbers (vol in decimal).
+The loaders also accept the original `.xlsx` exports if present.
 
-## Conventions (already wired into the harness)
+## Conventions (wired into the harness)
 - ATM = Delta-Neutral Straddle (DNS)
-- Premium-adjusted = YES
+- Premium-adjusted = Yes
 - Delta = Spot (<1Y) / Forward (>=1Y)
 
-Then run:  `python scripts/run_bloomberg_validation.py`
+## Run
+```bash
+python scripts/run_bloomberg_real.py
+```
+Without the data files the script prints an explanatory message and exits
+cleanly; the rest of the project runs on the synthetic G10 surfaces.
+
+## Result on the reference snapshot (05 Mar 2025)
+Vol agrees with Bloomberg to 3.2bp average (15.8bp max) across 187 points;
+strikes to 0.0006 average. See `RESULTS.md`.
+
+## Methodology reference
+Follows Mathema's Bloomberg OVML comparison:
+https://help.mathema.com.cn/latest/docs/toolbox/bbg_ovml.html

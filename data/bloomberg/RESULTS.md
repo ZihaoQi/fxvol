@@ -1,13 +1,13 @@
-# Bloomberg OVML validation results — USDCNY
+# Bloomberg OVML validation results — USDCNH
 
 Replication of the Mathema Bloomberg OVDV surface-construction validation, run
-against a real USDCNY onshore snapshot (spot 7.2605).
+against a real USDCNH onshore snapshot (spot 7.2605).
 
 ## Inputs (all from Bloomberg)
 - `volatility_surface.xlsx` — raw ATM / 25D RR-BF / 10D RR-BF per tenor.
 - `detailed_volatility_smile.xlsx` — Bloomberg's calibrated strike + vol at 11
   delta points (5/10/15/25/35 P, ATM, 35/25/15/10/5 C) for 17 tenors.
-- `rates_20250305.csv` — USD and CNY deposit rates and USDCNY forwards.
+- `rates_20250305.csv` — USD and CNY deposit rates and USDCNH forwards.
 
 ## Conventions (matched to Bloomberg)
 - ATM = Delta-Neutral Straddle (DNS)
@@ -42,11 +42,11 @@ from 1W out agrees to better than ~11 bp, wings included.
 
 ## What this exercise caught
 
-Running real (non-flat) USDCNY rates exposed a genuine bug in the surface
+Running real (non-flat) USDCNH rates exposed a genuine bug in the surface
 interpolation: `total_variance` was computing log-moneyness from a single
 surface-wide forward, while each smile had been fitted in its own per-tenor
 forward. With a flat rate curve this is harmless (all forwards equal), so the
-unit tests passed — but with USDCNY's forward running 7.26 → 6.54 across the
+unit tests passed — but with USDCNH's forward running 7.26 → 6.54 across the
 curve, long-tenor vols came out roughly doubled. The fix stores per-tenor
 forwards and reads each bracketing smile at its own moneyness
 (`test_per_tenor_forwards_no_double_count` guards it). This bug would also have

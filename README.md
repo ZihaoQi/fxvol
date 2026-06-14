@@ -4,7 +4,7 @@ A Python library implementing the full FX options modelling ladder **from volati
 models**, validated against Bloomberg vol surface, with a Greek P&L attribution engine and
 a risk grid and limit monitor built on top.
 
-**Highlight:** reproduces Bloomberg's USDCNY OVML vol surface to **3.2 bp
+**Highlight:** reproduces Bloomberg's USDCNH OVML vol surface to **3.2 bp
 average error across 187 points** under full market conventions (premium-adjusted
 delta-neutral straddle, tenor-dependent spot/forward delta).
 
@@ -15,7 +15,7 @@ Each tenor's SVI smile is calibrated to all 11 Bloomberg strike/vol points under
 Bloomberg's own conventions (delta-neutral straddle ATM, premium-adjusted,
 spot delta <1Y / forward delta >=1Y) using Bloomberg's actual forwards. The
 surface is then evaluated at Bloomberg's strikes and the implied vol compared.
-USDCNY on 05 Mar 2025.
+USDCNH on 05 Mar 2025.
 
 ![Validation error by tenor](docs/img/validation_error.png)
 
@@ -38,7 +38,7 @@ range.
 
 ![Term structure](docs/img/term_structure.png)
 
-USDCNY ATM rises 4.4% -> 5.2%; the 25D risk reversal flips from negative (puts
+USDCNH ATM rises 4.4% -> 5.2%; the 25D risk reversal flips from negative (puts
 bid) at the front to strongly positive at the back — a real feature of the pair.
 
 
@@ -108,9 +108,9 @@ The demo book is long gamma/vega: it loses most when spot *and* vol fall togethe
 
 ## What this exercise caught
 
-Running real (non-flat) USDCNY rates exposed a genuine surface-interpolation
+Running real (non-flat) USDCNH rates exposed a genuine surface-interpolation
 bug: total variance was read at a single surface-wide forward while each smile
-was fitted in its own per-tenor forward. With USDCNY's forward running
+was fitted in its own per-tenor forward. With USDCNH's forward running
 7.26 -> 6.54 across the curve, long-tenor vols came out **roughly doubled**
 (5Y ATM: 10.5% vs 5.2%). Flat-rate unit tests couldn't see it; the Bloomberg
 comparison did. The fix stores per-tenor forwards and is guarded by a regression
@@ -133,7 +133,7 @@ uv run python scripts/generate_readme_figures.py  # rebuild the figures above
 
 ## Notes
 
-- **Data:** the Bloomberg validation uses a real USDCNY OVML snapshot
+- **Data:** the Bloomberg validation uses a real USDCNH OVML snapshot
   (05 Mar 2025) which is **licensed terminal data and not redistributed**. The G10 surfaces shipped in the repo are model-generated and illustrative.
 - **Validation methodology** follows [Mathema](#references)'s Bloomberg OVML comparison.
 - The P&L and risk sections use a representative synthetic EURUSD book, since
