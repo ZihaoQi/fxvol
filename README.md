@@ -1,99 +1,146 @@
-# FX Volatility Surface Modelling + P&L Engine + Risk Grid & Limit Monitor
+# fxvol — FX Volatility Modelling Stack
 
-FX option pricing models, built up the full modeling ladder a real desk uses
-(**from volatility surfaces to multi-factor exotic models**) with a P&L explain engine and a risk grid with limit monitor.
+A Python library implementing the full FX options modelling ladder **from volatility-surface construction to multi-factor exotic
+models**, validated against Bloomberg vol surface, with a Greek P&L attribution engine and
+a risk grid and limit monitor built on top.
 
-This is a learning-by-building project. Each layer depends on the one below it,
-which is also the order to build them in.
-
-## The ladder
-
-| Layer | Module | What it does |
-|-------|--------|--------------|
-| Foundation | `core/` | Garman-Kohlhagen (FX Black-Scholes), Greeks, delta conventions |
-| Surface | `surface/` | ATM/RR/BF quotes → SVI smile → 2D surface with no-arb checks |
-| Local vol | `localvol/` | Dupire local volatility from the surface |
-| Stochastic vol | `stochvol/` | Heston via characteristic function + calibration |
-| LSV | `lsv/` | Leverage function bridging Heston to an exact surface fit |
-| Multi-factor | `multifactor/` | Spot FX + Hull-White rates, Monte Carlo, FX-rates correlation |
-
-## Design principle
-
-Every model implements the same interface (`PricingModel` in `base.py`):
-`calibrate(market)` then `price(strike, expiry)`. That substitutability is the
-point — a risk system swaps one model for another without knowing the difference.
-
-## Setup
-
-```bash
-uv sync --extra dev
-uv run pytest
-```
-
-## Status
-
-Built incrementally. Tests define "correct" for each layer — make them green.
-
-## Desk tooling (built on the model stack)
-
-Three production modules sit on top of the pricing ladder:
-
-### `validation/` — Bloomberg OVML surface validation
-Replicates [Mathema](#reference)'s Bloomberg OVDV comparison methodology for USDCNY: builds
-the surface under Bloomberg's exact conventions (DNS ATM, premium-adjusted,
-spot delta <1Y / forward delta >=1Y), backs out strike+vol at 11 delta points
-per tenor, and reports the within-10D vs total error split.
-
-Run against the included real USDCNY snapshot:
-`uv run python scripts/run_bloomberg_real.py`.
-
-**Result**: vol agrees with Bloomberg to
-3.2bp avg (15.8bp max) and strikes to 0.0006 avg across 187 points.
+**Highlight:** reproduces Bloomberg's USDCNY OVML vol surface to **3.2 bp
+average error across 187 points** under full market conventions (premium-adjusted
+delta-neutral straddle, tenor-dependent spot/forward delta).
 
 
-| Metric | Within 10D | Total (all points) |
+## Bloomberg validation
+
+Each tenor's SVI smile is calibrated to all 11 Bloomberg strike/vol points under
+Bloomberg's own conventions (delta-neutral straddle ATM, premium-adjusted,
+spot delta <1Y / forward delta >=1Y) using Bloomberg's actual forwards. The
+surface is then evaluated at Bloomberg's strikes and the implied vol compared.
+USDCNY on 05 Mar 2025.
+
+![Validation error by tenor](docs/img/validation_error.png)
+
+| Metric | Within 10D | Total (187 pts) |
 |---|---|---|
 | Vol abs error (avg) | 3.19 bp | 3.16 bp |
 | Vol abs error (max) | 15.8 bp | 15.8 bp |
 | Strike abs error (avg) | 0.00051 | 0.00062 |
-| Strike abs error (max) | 0.0053 | 0.0072 |
 
-187 points across 17 tenors × 11 delta strikes.
+Largest diffs sit at 1-day (no 1D forward on the rate screen; noisiest smile).
+From 1W out, agreement is under 11 bp including the wings.
 
-The largest vol differences are all at the 1-day tenor (no 1D forward on the
-rate screen — 1W rates are reused — and the 1D smile is noisiest). Everything
-from 1W out agrees to better than ~11 bp, wings included.
+### Fitted smiles vs Bloomberg
 
-![image](presentation/1_validation.png)
+![SVI smiles vs Bloomberg](docs/img/smiles.png)
 
-![image](presentation/2_surface.png)
+Dots are Bloomberg's calibrated points; lines are the SVI fit. The smile steepens
+and widens with tenor — the SVI parametrization tracks it across the full strike
+range.
 
-### `pnl/` — Greek P&L explain engine
-The nightly desk process: decomposes daily book P&L into
-delta / gamma / vega / volga / vanna / theta + an unexplained residual.
+![Term structure](docs/img/term_structure.png)
 
- `uv run python scripts/demo_desk_workflow.py`.
+USDCNY ATM rises 4.4% -> 5.2%; the 25D risk reversal flips from negative (puts
+bid) at the front to strongly positive at the back — a real feature of the pair.
 
-![image](presentation/3_pl_engine.png)
 
-### `risk/` — risk grid + limit monitor
-Full spot x vol revaluation grid, bucketed vega by tenor, and a configurable
-limit monitor (per-Greek, per-bucket, and worst-cell) with breach flags.
+## Synthetic G10 surfaces
 
-Run the combined demo: `uv run python scripts/demo_desk_workflow.py`
+Because the Bloomberg data is licensed and not redistributed (see note below),
+the repo ships **model-generated, illustrative** surfaces for the major pairs so
+it runs end-to-end for anyone who clones it. These are built from realistic
+ATM / RR / BF term structures — not market quotes — calibrated to resemble each
+pair's characteristic smile (USDJPY's steep downside skew, EURUSD's mild low-vol
+smile, etc.).
 
-![image](presentation/4_risk_grid.png)
+![Synthetic G10 smiles](docs/img/synthetic_g10_smiles.png)
 
-## Visual report
+![Synthetic G10 surfaces](docs/img/synthetic_g10_surfaces.png)
 
-`presentation/fxvol_report.html` is a self-contained interactive report
-(validation results, vol surface, smiles, P&L attribution, risk grid, limits).
-Open it in any browser. Regenerate from live model outputs with:
+All four surfaces are arbitrage-free (butterfly and calendar checks pass). Build
+one with `fxvol.synthetic.g10.build_surface("EURUSD")`.
+
+
+
+## The modelling ladder
+
+| Layer | Module | Role |
+|---|---|---|
+| Foundation | `core/` | Garman-Kohlhagen, full Greeks, FX delta conventions |
+| Surface | `surface/` | SVI smile + 2D surface, butterfly & calendar no-arb |
+| Local vol | `localvol/` | Dupire local volatility from the surface |
+| Stochastic vol | `stochvol/` | Heston via characteristic function + calibration |
+| LSV | `lsv/` | Leverage function bridging Heston to exact fit |
+| Multi-factor | `multifactor/` | FX spot + dual Hull-White rates, Monte Carlo |
+
+Each layer exists because the one below it fails at something a trader pays for:
+Black-Scholes can't see the smile; the surface maps it but says nothing about
+dynamics; local vol reprices vanillas exactly but gets the smile's *motion*
+wrong (mishedging barriers); Heston fixes dynamics but loses exact fit; LSV
+unifies both; and the three-factor model un-freezes interest rates for
+long-dated exotics, where FX-rates correlation becomes priced, hedgeable risk.
+
+
+## Greek P&L explain engine
+
+The nightly desk process: decompose one day's book P&L into
+delta / gamma / vega / volga / vanna / theta + an unexplained residual. A
+small residual means the risk numbers faithfully describe the book. (Demo book
+of four EURUSD options over a +0.4% spot, +0.5pt vol move.)
+
+![Greek P&L attribution](docs/img/pnl_attribution.png)
+
+Delta and vega dominate; gamma, vanna and volga are small but non-zero — and
+omitting the cross-terms is exactly what blows the residual open on a skewed
+book. Here the residual is **0.5% of actual P&L**.
+
+
+## Risk grid & limit monitor
+
+Full spot x vol revaluation — not just point Greeks — surfaces where P&L craters
+in the tails. Bucketed vega exposes term-structure bets a single vega number
+hides; the limit monitor flags breaches per Greek, per bucket, and on worst-case
+grid loss.
+
+![Risk grid](docs/img/risk_grid.png)
+
+The demo book is long gamma/vega: it loses most when spot *and* vol fall together
+(bottom-left), gains when both rise.
+
+
+## What this exercise caught
+
+Running real (non-flat) USDCNY rates exposed a genuine surface-interpolation
+bug: total variance was read at a single surface-wide forward while each smile
+was fitted in its own per-tenor forward. With USDCNY's forward running
+7.26 -> 6.54 across the curve, long-tenor vols came out **roughly doubled**
+(5Y ATM: 10.5% vs 5.2%). Flat-rate unit tests couldn't see it; the Bloomberg
+comparison did. The fix stores per-tenor forwards and is guarded by a regression
+test. The same bug would have mispriced the P&L engine and risk grid under any
+realistic rate curve.
+
+
+
+## Install & run
 
 ```bash
-uv run python scripts/generate_report.py
+uv sync --extra dev
+uv run pytest                                     # 21 tests
+
+uv run python scripts/run_bloomberg_real.py       # the validation
+uv run python scripts/demo_desk_workflow.py       # P&L + risk on a sample book
+uv run python scripts/generate_readme_figures.py  # rebuild the figures above
 ```
 
+
+## Notes
+
+- **Data:** the Bloomberg validation uses a real USDCNY OVML snapshot
+  (05 Mar 2025) which is **licensed terminal data and not redistributed**. The G10 surfaces shipped in the repo are model-generated and illustrative.
+- **Validation methodology** follows [Mathema](#references)'s Bloomberg OVML comparison.
+- The P&L and risk sections use a representative synthetic EURUSD book, since
+  position data isn't part of a market snapshot.
+- Architecture: every model implements a common `calibrate`/`price` interface
+  (`base.py`), so models are interchangeable behind the same risk plumbing.
+- Tooling: `pytest`, `ruff`, `mypy`, type hints throughout, CI on 3.10-3.12.
 
 ## References
 
