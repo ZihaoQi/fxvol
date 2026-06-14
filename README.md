@@ -26,8 +26,8 @@ point — a risk system swaps one model for another without knowing the differen
 ## Setup
 
 ```bash
-pip install -e ".[dev]"
-pytest
+uv sync --extra dev
+uv run pytest
 ```
 
 ## Status
@@ -45,7 +45,7 @@ spot delta <1Y / forward delta >=1Y), backs out strike+vol at 11 delta points
 per tenor, and reports the within-10D vs total error split.
 
 Run against the included real USDCNY snapshot:
-`python scripts/run_bloomberg_real.py`.
+`uv run python scripts/run_bloomberg_real.py`.
 
 **Result**: vol agrees with Bloomberg to
 3.2bp avg (15.8bp max) and strikes to 0.0006 avg across 187 points.
@@ -68,13 +68,13 @@ from 1W out agrees to better than ~11 bp, wings included.
 The nightly desk process: decomposes daily book P&L into
 delta / gamma / vega / volga / vanna / theta + an unexplained residual.
 
- `python scripts/demo_desk_workflow.py`.
+ `uv run python scripts/demo_desk_workflow.py`.
 
 ### `risk/` — risk grid + limit monitor
 Full spot x vol revaluation grid, bucketed vega by tenor, and a configurable
 limit monitor (per-Greek, per-bucket, and worst-cell) with breach flags.
 
-Run the combined demo: `python scripts/demo_desk_workflow.py`
+Run the combined demo: `uv run python scripts/demo_desk_workflow.py`
 
 
 ## Visual report
@@ -84,7 +84,7 @@ Run the combined demo: `python scripts/demo_desk_workflow.py`
 Open it in any browser. Regenerate from live model outputs with:
 
 ```bash
-python scripts/generate_report.py
+uv run python scripts/generate_report.py
 ```
 
 
