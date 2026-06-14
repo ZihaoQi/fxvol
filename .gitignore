@@ -16,5 +16,6 @@ wheels/
 htmlcov/
 .DS_Store
 
-.csv
-.xlsx
+# Bloomberg terminal data — licensed, not redistributed (see README)
+data/bloomberg/*.csv
+data/bloomberg/*.xlsx
