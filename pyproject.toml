@@ -1,18 +1,41 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "fxvol"
 version = "0.1.0"
-description = "Add your description here"
+description = "FX option pricing models: from volatility surfaces to multi-factor exotics"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
-    "numpy>=2.4.6",
-    "scipy>=1.17.1",
+    "numpy>=1.24",
+    "openpyxl>=3.1.5",
+    "pandas>=2.3.3",
+    "scipy>=1.10",
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
-    "mypy>=2.1.0",
-    "pytest>=9.1.0",
-    "pytest-cov>=7.1.0",
-    "ruff>=0.15.17",
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "mypy>=1.0",
+    "ruff>=0.1",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
