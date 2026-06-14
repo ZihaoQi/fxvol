@@ -15,3 +15,6 @@ wheels/
 .coverage
 htmlcov/
 .DS_Store
+
+.csv
+.xlsx
