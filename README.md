@@ -1,7 +1,7 @@
 # FX Volatility Surface Modelling + P&L Engine + Risk Grid & Limit Monitor
 
-FX option pricing models, built up the full modeling ladder a real desk uses:
-**from volatility surfaces to multi-factor exotic models.**
+FX option pricing models, built up the full modeling ladder a real desk uses
+(**from volatility surfaces to multi-factor exotic models**) with a P&L explain engine and a risk grid with limit monitor.
 
 This is a learning-by-building project. Each layer depends on the one below it,
 which is also the order to build them in.
@@ -64,11 +64,17 @@ The largest vol differences are all at the 1-day tenor (no 1D forward on the
 rate screen — 1W rates are reused — and the 1D smile is noisiest). Everything
 from 1W out agrees to better than ~11 bp, wings included.
 
+![image](presentation/1_validation.png)
+
+![image](presentation/2_surface.png)
+
 ### `pnl/` — Greek P&L explain engine
 The nightly desk process: decomposes daily book P&L into
 delta / gamma / vega / volga / vanna / theta + an unexplained residual.
 
  `uv run python scripts/demo_desk_workflow.py`.
+
+![image](presentation/3_pl_engine.png)
 
 ### `risk/` — risk grid + limit monitor
 Full spot x vol revaluation grid, bucketed vega by tenor, and a configurable
@@ -76,6 +82,7 @@ limit monitor (per-Greek, per-bucket, and worst-cell) with breach flags.
 
 Run the combined demo: `uv run python scripts/demo_desk_workflow.py`
 
+![image](presentation/4_risk_grid.png)
 
 ## Visual report
 
