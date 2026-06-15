@@ -30,7 +30,7 @@ from ..surface.surface import VolSurface
 
 def expected_variance_path(p: HestonParams, t: float) -> float:
     """E[v_t] under Heston: theta + (v0 - theta) e^{-kappa t}. Unconditional."""
-    return p.theta + (p.v0 - p.theta) * np.exp(-p.kappa * t)
+    return float(p.theta + (p.v0 - p.theta) * np.exp(-p.kappa * t))
 
 
 def leverage(surface: VolSurface, p: HestonParams, S: float, t: float) -> float:

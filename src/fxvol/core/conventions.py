@@ -44,7 +44,7 @@ class ATMConvention(Enum):
 
 
 def forward(S: float, T: float, r_d: float, r_f: float) -> float:
-    return S * np.exp((r_d - r_f) * T)
+    return float(S * np.exp((r_d - r_f) * T))
 
 
 def delta_type_for_tenor(
@@ -76,15 +76,15 @@ def _delta_of_strike(
         base = norm.cdf(d1) if is_call else norm.cdf(d1) - 1.0
         if delta_type == DeltaType.SPOT:
             base *= np.exp(-r_f * T)
-        return base
+        return float(base)
 
     # premium-adjusted: the premium (in foreign ccy) is netted out. The PA delta
     # is (K/F) * N(d2)-type, carrying K on both sides - hence the root-find in
     # strike_from_delta. Sign handled per call/put.
     disc_f = np.exp(-r_f * T) if delta_type == DeltaType.SPOT_PA else 1.0
     if is_call:
-        return disc_f * (K / F) * norm.cdf(d2)
-    return -disc_f * (K / F) * norm.cdf(-d2)
+        return float(disc_f * (K / F) * norm.cdf(d2))
+    return float(-disc_f * (K / F) * norm.cdf(-d2))
 
 
 def strike_from_delta(
@@ -148,5 +148,5 @@ def atm_strike(
         return S
     # DNS
     if premium_adjusted:
-        return F * np.exp(-0.5 * sigma**2 * T)
-    return F * np.exp(0.5 * sigma**2 * T)
+        return float(F * np.exp(-0.5 * sigma**2 * T))
+    return float(F * np.exp(0.5 * sigma**2 * T))

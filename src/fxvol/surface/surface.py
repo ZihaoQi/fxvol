@@ -57,7 +57,7 @@ class VolSurface:
             i = np.searchsorted(ts, T)
             t0, t1 = ts[i - 1], ts[i]
             f0, f1 = self.forwards[i - 1], self.forwards[i]
-            return f0 + (f1 - f0) * (T - t0) / (t1 - t0)
+            return float(f0 + (f1 - f0) * (T - t0) / (t1 - t0))
         return forward(self.spot, T, self.r_dom, self.r_for)
 
     def total_variance(self, K: float, T: float) -> float:
