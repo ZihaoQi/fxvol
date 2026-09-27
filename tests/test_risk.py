@@ -1,11 +1,11 @@
 """Risk grid, bucketed vega, and limit monitor tests."""
-from fxvol.core.quotes import SmileQuote
-from fxvol.pnl.book import Book, OptionPosition
-from fxvol.pnl.engine import MarketState
-from fxvol.risk.grid import (
+from fxvol.pricing.core.quotes import SmileQuote
+from fxvol.desk.pnl.book import Book, OptionPosition
+from fxvol.desk.pnl.engine import MarketState
+from fxvol.desk.risk.grid import (
     Limit, LimitMonitor, bucketed_vega, build_risk_grid,
 )
-from fxvol.surface.surface import VolSurface
+from fxvol.pricing.surface.surface import VolSurface
 
 
 def _market():

@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from ..core.black_scholes import gk_greeks
+from fxvol.pricing.core.black_scholes import gk_greeks
 from ..pnl.book import Book
 from ..pnl.engine import MarketState
 
@@ -89,16 +89,23 @@ BUCKETS: list[tuple[str, float]] = [
 ]
 
 
+def bucket_for(expiry: float) -> str:
+    """The tenor bucket a given expiry (in years) falls into. The single
+    definition every module that buckets by tenor imports, rather than each
+    reimplementing the same walk over BUCKETS."""
+    for name, upper_bound in BUCKETS:
+        if expiry <= upper_bound:
+            return name
+    return BUCKETS[-1][0]
+
+
 def bucketed_vega(book: Book, m: MarketState) -> dict[str, float]:
     """Vega per tenor bucket (per 1.00 vol move), notionals applied."""
     out = {name: 0.0 for name, _ in BUCKETS}
     for p in book.positions:
         v = m.surface.implied_vol(p.strike, p.expiry)
         g = gk_greeks(m.spot, p.strike, p.expiry, m.r_dom, m.r_for, v, p.is_call)
-        for name, ub in BUCKETS:
-            if p.expiry <= ub:
-                out[name] += g.vega * p.notional
-                break
+        out[bucket_for(p.expiry)] += g.vega * p.notional
     return out
 
 

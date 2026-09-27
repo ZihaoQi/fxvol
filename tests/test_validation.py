@@ -1,10 +1,10 @@
 """Bloomberg validation harness: structure + self-consistency tests."""
 
-from fxvol.core.conventions import (
+from fxvol.pricing.core.conventions import (
     ATMConvention, atm_strike, delta_type_for_tenor, strike_from_delta,
 )
-from fxvol.core.quotes import SmileQuote
-from fxvol.validation.bloomberg import (
+from fxvol.pricing.core.quotes import SmileQuote
+from fxvol.data.validation.bloomberg import (
     BloombergTarget, DELTA_POINTS, MarketData, build_surface, compare,
 )
 

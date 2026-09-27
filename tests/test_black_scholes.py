@@ -2,8 +2,7 @@
 
 Run with:  pytest tests/test_black_scholes.py -v
 
-Why these specific tests? Each one pins down a property that MUST hold for any
-correct implementation, independent of the exact numbers:
+Properties that MUST hold:
   - put-call parity is a no-arbitrage identity; if it fails, the model is wrong
   - delta bounds catch sign/factor errors
   - the zero-rate case collapses to plain Black-Scholes, a known reference

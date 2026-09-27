@@ -2,8 +2,8 @@
 import numpy as np
 import pytest
 
-from fxvol.core.black_scholes import garman_kohlhagen
-from fxvol.multifactor.three_factor import ThreeFactorParams, price_long_dated_call
+from fxvol.pricing.core.black_scholes import garman_kohlhagen
+from fxvol.pricing.multifactor.three_factor import ThreeFactorParams, price_long_dated_call
 
 
 def test_zero_ratevol_recovers_gk():

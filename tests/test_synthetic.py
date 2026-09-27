@@ -1,7 +1,7 @@
 """Synthetic G10 surface tests: well-formed, arb-free, realistic ordering."""
 import numpy as np
 
-from fxvol.synthetic.g10 import SPECS, TENORS, all_pairs, build_surface
+from fxvol.data.synthetic.g10 import SPECS, TENORS, all_pairs, build_surface
 
 
 def test_all_pairs_build_and_no_calendar_arb():

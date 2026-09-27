@@ -19,8 +19,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..core.quotes import SmileQuote
-from ..surface.surface import VolSurface
+import numpy as np
+
+from fxvol.pricing.core.quotes import SmileQuote
+from fxvol.pricing.surface.maintenance import DailyQuotes
+from fxvol.pricing.surface.surface import VolSurface
 
 # Standard tenor grid (year fractions)
 TENORS = [1 / 12, 0.25, 0.5, 1.0, 2.0]
@@ -91,3 +94,51 @@ def build_surface(pair: str) -> VolSurface:
 
 def all_pairs() -> list[str]:
     return list(SPECS.keys())
+
+
+def simulate_quote_history(
+    pair: str, n_days: int, seed: int = 0,
+    daily_noise_std: float = 0.0015,
+    freeze_days: dict[int, int] | None = None,
+    outlier_days: dict[int, tuple[int, float]] | None = None,
+) -> list[DailyQuotes]:
+    """A day by day sequence of illustrative quote sets for `pair`, built by
+    random walking the baseline SPECS term structure. Used to exercise the
+    surface maintenance pipeline end to end without needing a live feed.
+
+    freeze_days   : {day_index: tenor_index} — on that day, the ATM quote for
+        that tenor is forced to repeat the prior day's value exactly, the
+        signature of a frozen feed.
+    outlier_days  : {day_index: (tenor_index, shock)} — on that day, `shock`
+        (absolute vol) is added on top of the ATM quote for that tenor, the
+        signature of a bad print.
+    """
+    freeze_days = freeze_days or {}
+    outlier_days = outlier_days or {}
+    spec = SPECS[pair]
+    rng = np.random.default_rng(seed)
+
+    atm = list(spec.atm)
+    days: list[DailyQuotes] = []
+    for day in range(n_days):
+        if day > 0:
+            atm = [max(v + rng.normal(0.0, daily_noise_std), 1e-4) for v in atm]
+        atm_today = list(atm)
+
+        if day in freeze_days and day > 0:
+            tenor_idx = freeze_days[day]
+            atm_today[tenor_idx] = days[-1].quotes[tenor_idx].atm_vol
+        if day in outlier_days:
+            tenor_idx, shock = outlier_days[day]
+            atm_today[tenor_idx] += shock
+
+        quotes = [
+            SmileQuote(T=T, atm_vol=atm_today[i], rr_25=spec.rr25[i],
+                      bf_25=spec.bf25[i], rr_10=spec.rr10[i], bf_10=spec.bf10[i])
+            for i, T in enumerate(TENORS)
+        ]
+        days.append(DailyQuotes(day=day, pair=pair, spot=spec.spot,
+                                r_dom=spec.r_dom, r_for=spec.r_for,
+                                quotes=quotes))
+        atm = atm_today
+    return days

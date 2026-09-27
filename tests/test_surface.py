@@ -1,6 +1,6 @@
 """Surface construction and no-arbitrage tests."""
-from fxvol.core.quotes import SmileQuote
-from fxvol.surface.surface import VolSurface
+from fxvol.pricing.core.quotes import SmileQuote
+from fxvol.pricing.surface.surface import VolSurface
 
 
 def _demo_surface():
@@ -28,8 +28,8 @@ def test_per_tenor_forwards_no_double_count():
     vols. The surface must use each tenor's OWN forward. Regression for the
     USDCNH validation bug."""
     import numpy as np
-    from fxvol.surface.smile import fit_svi
-    from fxvol.surface.surface import VolSurface
+    from fxvol.pricing.surface.smile import fit_svi
+    from fxvol.pricing.surface.surface import VolSurface
 
     # Two tenors with very different forwards (like USDCNH 6M vs 5Y).
     spot = 7.2605

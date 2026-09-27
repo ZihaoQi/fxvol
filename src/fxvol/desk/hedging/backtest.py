@@ -23,7 +23,7 @@ from enum import Enum
 
 import numpy as np
 
-from ..core.black_scholes import gk_greeks
+from fxvol.pricing.core.black_scholes import gk_greeks
 
 
 class HedgeRule(Enum):

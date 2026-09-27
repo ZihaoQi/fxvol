@@ -9,12 +9,12 @@ from pathlib import Path
 
 import numpy as np
 
-from fxvol.core.black_scholes import gk_greeks
-from fxvol.core.quotes import SmileQuote
-from fxvol.pnl.book import Book, OptionPosition
-from fxvol.pnl.engine import MarketState, explain
-from fxvol.risk.grid import Limit, LimitMonitor, bucketed_vega, build_risk_grid
-from fxvol.surface.surface import VolSurface
+from fxvol.pricing.core.black_scholes import gk_greeks
+from fxvol.pricing.core.quotes import SmileQuote
+from fxvol.desk.pnl.book import Book, OptionPosition
+from fxvol.desk.pnl.engine import MarketState, explain
+from fxvol.desk.risk.grid import Limit, LimitMonitor, bucketed_vega, build_risk_grid
+from fxvol.pricing.surface.surface import VolSurface
 
 ROOT = Path(__file__).resolve().parents[1]
 

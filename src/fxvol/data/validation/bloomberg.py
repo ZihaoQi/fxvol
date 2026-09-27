@@ -23,15 +23,15 @@ from pathlib import Path
 
 import numpy as np
 
-from ..core.conventions import (
+from fxvol.pricing.core.conventions import (
     ATMConvention,
     atm_strike,
     delta_type_for_tenor,
     forward,
     strike_from_delta,
 )
-from ..core.quotes import SmileQuote
-from ..surface.surface import VolSurface
+from fxvol.pricing.core.quotes import SmileQuote
+from fxvol.pricing.surface.surface import VolSurface
 
 
 # Standard Bloomberg OVML delta points (signed: negative = put wing).
@@ -109,7 +109,7 @@ def build_surface(md: MarketData) -> VolSurface:
     """Build our surface from the raw data (per-tenor rates honored)."""
     # VolSurface.from_quotes assumes flat rates; here rates vary by tenor, so we
     # build per-tenor smiles directly with each tenor's own (r_dom, r_for).
-    from ..surface.smile import fit_svi
+    from fxvol.pricing.surface.smile import fit_svi
 
     tenors = sorted(md.quotes)
     smiles = []

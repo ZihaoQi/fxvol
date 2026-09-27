@@ -25,10 +25,34 @@ and the project's own vol surface, so it exercises the whole stack end to end.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Protocol
 
-from ..core.black_scholes import gk_greeks
-from ..surface.surface import VolSurface
+from fxvol.pricing.core.black_scholes import gk_greeks
+from fxvol.pricing.surface.surface import VolSurface
 from .book import Book
+
+
+class MarketLike(Protocol):
+    """Structural type for anything that can stand in for a MarketState: a
+    spot, domestic and foreign rates, and a vol lookup. MarketState satisfies
+    this by construction; the shocked market wrapper used to shift a market
+    inside a simulation or a stress scenario (see
+    pnl.valuation.ShockedMarketState) satisfies it without inheriting from
+    MarketState, so either can be passed anywhere a MarketLike is expected.
+    Declared with read-only properties (rather than plain attributes) so that
+    both a mutable dataclass field and a computed @property implementation
+    satisfy the protocol.
+    """
+    @property
+    def spot(self) -> float: ...
+
+    @property
+    def r_dom(self) -> float: ...
+
+    @property
+    def r_for(self) -> float: ...
+
+    def vol(self, strike: float, expiry: float) -> float: ...
 
 
 @dataclass

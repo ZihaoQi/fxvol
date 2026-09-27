@@ -2,8 +2,8 @@
 
 import pytest
 
-from fxvol.core.black_scholes import garman_kohlhagen
-from fxvol.core.conventions import DeltaType, strike_from_delta, forward
+from fxvol.pricing.core.black_scholes import garman_kohlhagen
+from fxvol.pricing.core.conventions import DeltaType, strike_from_delta, forward
 
 
 def test_strike_from_delta_roundtrip():
@@ -16,7 +16,7 @@ def test_strike_from_delta_roundtrip():
 
 def test_atm_dns_pa_below_forward():
     """Premium-adjusted DNS (USDCNH convention) sits BELOW the forward."""
-    from fxvol.core.conventions import ATMConvention, atm_strike
+    from fxvol.pricing.core.conventions import ATMConvention, atm_strike
     S, T, r_d, r_f, sigma = 1.10, 1.0, 0.03, 0.01, 0.20
     k_pa = atm_strike(S, T, r_d, r_f, sigma, ATMConvention.DNS, premium_adjusted=True)
     k_npa = atm_strike(S, T, r_d, r_f, sigma, ATMConvention.DNS, premium_adjusted=False)

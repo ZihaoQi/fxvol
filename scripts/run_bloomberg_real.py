@@ -17,11 +17,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from fxvol.core.conventions import (
+from fxvol.pricing.core.conventions import (
     ATMConvention, atm_strike, delta_type_for_tenor, forward, strike_from_delta,
 )
-from fxvol.surface.smile import fit_svi
-from fxvol.surface.surface import VolSurface
+from fxvol.pricing.surface.smile import fit_svi
+from fxvol.pricing.surface.surface import VolSurface
 
 SPOT = 7.2605
 TENORS = {

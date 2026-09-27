@@ -3,11 +3,11 @@
 Run:  python scripts/demo_desk_workflow.py
 Shows the three production pieces working together on one option book.
 """
-from fxvol.core.quotes import SmileQuote
-from fxvol.pnl.book import Book, OptionPosition
-from fxvol.pnl.engine import MarketState, explain
-from fxvol.risk.grid import Limit, LimitMonitor, bucketed_vega, build_risk_grid
-from fxvol.surface.surface import VolSurface
+from fxvol.pricing.core.quotes import SmileQuote
+from fxvol.desk.pnl.book import Book, OptionPosition
+from fxvol.desk.pnl.engine import MarketState, explain
+from fxvol.desk.risk.grid import Limit, LimitMonitor, bucketed_vega, build_risk_grid
+from fxvol.pricing.surface.surface import VolSurface
 
 
 def _surface(S, bump=0.0):

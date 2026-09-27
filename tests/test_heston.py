@@ -1,8 +1,8 @@
 """Heston pricing sanity tests."""
 import pytest
 
-from fxvol.core.black_scholes import garman_kohlhagen
-from fxvol.stochvol.heston import HestonParams, heston_price
+from fxvol.pricing.core.black_scholes import garman_kohlhagen
+from fxvol.pricing.stochvol.heston import HestonParams, heston_price
 
 
 def test_heston_put_call_parity():

@@ -21,6 +21,7 @@ dev = [
     "pytest-cov>=4.0",
     "mypy>=1.0",
     "ruff>=0.1",
+    "matplotlib>=3.7",
 ]
 
 [tool.setuptools.packages.find]

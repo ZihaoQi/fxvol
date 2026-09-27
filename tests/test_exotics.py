@@ -1,10 +1,10 @@
 """Exotic pricer tests: barrier bridge correction, TARF logic, MC consistency."""
 
-from fxvol.core.quotes import SmileQuote
-from fxvol.exotics.barrier_mc import BarrierType, price_barrier
-from fxvol.exotics.tarf import TARFSpec, price_tarf
-from fxvol.stochvol.heston import HestonParams
-from fxvol.surface.surface import VolSurface
+from fxvol.pricing.core.quotes import SmileQuote
+from fxvol.pricing.exotics.barrier_mc import BarrierType, price_barrier
+from fxvol.pricing.exotics.tarf import TARFSpec, price_tarf
+from fxvol.pricing.stochvol.heston import HestonParams
+from fxvol.pricing.surface.surface import VolSurface
 
 
 def _surf():

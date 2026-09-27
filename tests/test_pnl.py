@@ -1,8 +1,8 @@
 """Greek P&L explain engine tests."""
-from fxvol.core.quotes import SmileQuote
-from fxvol.pnl.book import Book, OptionPosition
-from fxvol.pnl.engine import MarketState, explain
-from fxvol.surface.surface import VolSurface
+from fxvol.pricing.core.quotes import SmileQuote
+from fxvol.desk.pnl.book import Book, OptionPosition
+from fxvol.desk.pnl.engine import MarketState, explain
+from fxvol.pricing.surface.surface import VolSurface
 
 
 def _surf(S, bump=0.0):
