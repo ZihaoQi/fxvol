@@ -6,7 +6,7 @@ A Python library implementing FX options modelling as well trading desk extensio
 - Extended it into a desk toolkit: inventory-skewed market-making simulator, cross-currency risk dashboard, and daily surface-maintenance pipeline with automated arbitrage checks.
 - 52 tests, full type checking, and a layered pricing/desk/data architecture.
 
-## Trading desk
+## Trading desk extensions
 This is an extension of simulated trading desk use.
 The layers below build a working vol surface with appropriate models. This part simulates answers for the 3 questions:
 
